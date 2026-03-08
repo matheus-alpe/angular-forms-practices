@@ -1,7 +1,24 @@
 <p class="mb-4">Types of Forms:</p>
 
-<app-form-signal />
+<div class="flex flex-col gap-4">
+  <details class="collapse collapse-arrow bg-base-200 border-emerald-300 border">
+    <summary class="collapse-title font-semibold">Signal Form</summary>
+    <div class="collapse-content">
+      <app-form-signal />
+    </div>
+  </details>
 
-<app-form-reactive />
+  <details class="collapse collapse-arrow bg-base-200 border-cyan-300 border">
+    <summary class="collapse-title font-semibold">Reactive Form</summary>
+    <div class="collapse-content">
+      <app-form-reactive />
+    </div>
+  </details>
 
-<app-form-template />
+  <details class="collapse collapse-arrow bg-base-200 border-indigo-300 border">
+    <summary class="collapse-title font-semibold">Template-Driven Form</summary>
+    <div class="collapse-content">
+      <app-form-template />
+    </div>
+  </details>
+</div>

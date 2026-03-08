@@ -1,9 +1,86 @@
-<fieldset class="fieldset bg-base-200 border-emerald-300 rounded-box w-xs border p-4">
-  <legend class="fieldset-legend">Signal Form</legend>
+<form class="flex flex-col gap-4" (submit)="onSubmit($event)">
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">First Name</legend>
+    <input
+      id="firstName"
+      type="text"
+      class="input"
+      autocomplete="given-name"
+      [formField]="loginForm.profile.firstName"
+    />
+    <label for="firstName" class="label">First Name ({{ loginModel().profile.firstName }})</label>
+  </fieldset>
 
-  <label for="email" class="label">Email </label>
-  <input id="email" type="text" class="input" [formField]="loginForm.email" />
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Last Name</legend>
+    <input
+      id="lastName"
+      type="text"
+      class="input"
+      autocomplete="family-name"
+      [formField]="loginForm.profile.lastName"
+    />
+    <label for="lastName" class="label">Last Name ({{ loginModel().profile.lastName }})</label>
+  </fieldset>
 
-  <label for="password" class="label">Password </label>
-  <input id="password" type="password" class="input" [formField]="loginForm.password" />
-</fieldset>
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Email</legend>
+    <input
+      id="email"
+      type="text"
+      class="input"
+      autocomplete="email"
+      [formField]="loginForm.email"
+    />
+    <label for="email" class="label">Email ({{ loginModel().email }})</label>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Password</legend>
+    <input
+      id="password"
+      type="password"
+      class="input"
+      autocomplete="new-password"
+      [formField]="loginForm.password"
+    />
+    <label for="password" class="label">Password ({{ passwordLength() }} characters)</label>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Theme</legend>
+    <select id="theme" class="select" [formField]="loginForm.settings.theme">
+      @for (theme of themeOptions; track theme) {
+        <option [value]="theme">{{ theme }}</option>
+      }
+    </select>
+    <label for="theme" class="label">Theme ({{ loginModel().settings.theme }})</label>
+  </fieldset>
+
+  <fieldset class="fieldset">
+    <legend class="fieldset-legend">Products</legend>
+    <div class="flex flex-col gap-2">
+      @for (product of loginModel().products; track product.id) {
+        <div class="flex items-center gap-2">
+          <input
+            type="text"
+            class="input"
+            placeholder="Product Name"
+            [formField]="loginForm.products[$index].name"
+          />
+          <input
+            type="number"
+            class="input w-24"
+            placeholder="Quantity"
+            [formField]="loginForm.products[$index].quantity"
+          />
+        </div>
+      }
+      <button type="button" class="btn btn-sm btn-soft" (click)="addRandomProduct()">
+        Add Random Product
+      </button>
+    </div>
+  </fieldset>
+
+  <button type="submit" class="btn btn-success mt-4">Submit</button>
+</form>
