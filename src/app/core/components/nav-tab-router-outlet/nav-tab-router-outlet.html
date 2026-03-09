@@ -1,0 +1,29 @@
+<div>
+  <nav>
+    <div role="tablist" class="tabs tabs-lift">
+      @for (route of routes(); track $index) {
+        @if (route.name) {
+          <a
+            role="tab"
+            class="tab [--tab-border-color:var(--color-primary)]"
+            [routerLink]="route.path"
+            routerLinkActive="tab-active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{
+              queryParams: 'ignored',
+              matrixParams: 'ignored',
+              paths: 'subset',
+              fragment: 'ignored',
+            }"
+          >
+            {{ route.name }}
+          </a>
+        }
+      }
+    </div>
+  </nav>
+
+  <div class="p-4 border-l border-b border-primary">
+    <router-outlet />
+  </div>
+</div>

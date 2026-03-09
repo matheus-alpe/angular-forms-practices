@@ -1,25 +1,3 @@
-<nav class="navbar">
-  <ul class="menu menu-horizontal bg-base-200">
-    @for (route of routes; track $index) {
-      @if (route.name) {
-        <li>
-          <a
-            [routerLink]="route.path"
-            routerLinkActive="active-button"
-            ariaCurrentWhenActive="page"
-            [routerLinkActiveOptions]="{
-              queryParams: 'ignored',
-              paths: 'exact',
-            }"
-          >
-            {{ route.name }}
-          </a>
-        </li>
-      }
-    }
-  </ul>
-</nav>
-
 <div class="p-4">
-  <router-outlet />
+  <app-nav-tab-router-outlet [routes]="routes" />
 </div>

@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { routes } from './app.routes';
+import { NavTabRouterOutlet } from './core/components/nav-tab-router-outlet/nav-tab-router-outlet';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [NavTabRouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

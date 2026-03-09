@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { Reactive } from './reactive/reactive';
-import { Template } from './template/template';
-import { Signal } from './signal/signal';
+import { NavTabRouterOutlet } from '../../core/components/nav-tab-router-outlet/nav-tab-router-outlet';
+import { FORMS_CHILDREN_ROUTES } from './forms.routes';
 
 @Component({
   selector: 'app-forms',
-  imports: [Reactive, Template, Signal],
+  imports: [NavTabRouterOutlet],
   templateUrl: './forms.html',
   styleUrl: './forms.css',
 })
-export class Forms {}
+export class Forms {
+  childrenRoutes = FORMS_CHILDREN_ROUTES;
+}

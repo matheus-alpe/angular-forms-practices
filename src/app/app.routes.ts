@@ -3,7 +3,7 @@ import { FORMS_ROUTES } from './routing/forms/forms.routes';
 
 export const routes: AppRoute[] = [
   {
-    path: '',
+    path: 'home',
     loadComponent: () => import('./routing/home/home').then((m) => m.Home),
     title: 'Home',
     name: 'Home',
