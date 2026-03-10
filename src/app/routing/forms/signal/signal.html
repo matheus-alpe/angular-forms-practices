@@ -1,4 +1,4 @@
-<form class="flex flex-col gap-4" (submit)="onSubmit($event)">
+<form class="flex flex-col gap-4" [formRoot]="loginForm">
   <fieldset class="fieldset">
     <legend class="fieldset-legend">First Name</legend>
     <input
@@ -20,7 +20,11 @@
       autocomplete="family-name"
       [formField]="loginForm.profile.lastName"
     />
-    <label for="lastName" class="label">Last Name ({{ loginModel().profile.lastName }})</label>
+    <label for="lastName" class="label"
+      >Last Name: {{ loginModel().profile.lastName }} ({{
+        loginForm.profile.lastName().readonly() ? 'readonly' : 'editable'
+      }})</label
+    >
   </fieldset>
 
   <fieldset class="fieldset">
@@ -31,8 +35,26 @@
       class="input"
       autocomplete="email"
       [formField]="loginForm.email"
+      [class]="{
+        'input-error': loginForm.email().invalid() && loginForm().touched(),
+        'input-success': loginForm.email().valid() && loginForm().touched(),
+      }"
     />
-    <label for="email" class="label">Email ({{ loginModel().email }})</label>
+    <label
+      for="email"
+      class="label"
+      [class]="{
+        'text-error': loginForm.email().invalid() && loginForm().touched(),
+      }"
+    >
+      @if (loginForm.email().invalid()) {
+        @for (error of loginForm.email().errors(); track error) {
+          <p>{{ error.message }}</p>
+        }
+      } @else {
+        Email ({{ loginModel().email }})
+      }
+    </label>
   </fieldset>
 
   <fieldset class="fieldset">
@@ -61,26 +83,78 @@
     <legend class="fieldset-legend">Products</legend>
     <div class="flex flex-col gap-2">
       @for (product of loginModel().products; track product.id) {
-        <div class="flex items-center gap-2">
-          <input
-            type="text"
-            class="input"
-            placeholder="Product Name"
-            [formField]="loginForm.products[$index].name"
-          />
-          <input
-            type="number"
-            class="input w-24"
-            placeholder="Quantity"
-            [formField]="loginForm.products[$index].quantity"
-          />
+        <div>
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              class="input"
+              placeholder="Product Name"
+              [formField]="loginForm.products[$index].name"
+              [class]="{
+                'input-error':
+                  loginForm.products[$index].name().invalid() &&
+                  loginForm.products[$index].name().touched(),
+              }"
+            />
+            <input
+              type="number"
+              class="input w-24"
+              placeholder="Quantity"
+              [formField]="loginForm.products[$index].quantity"
+              [class]="{
+                'input-error':
+                  loginForm.products[$index].quantity().invalid() &&
+                  loginForm.products[$index].quantity().touched(),
+              }"
+            />
+          </div>
+
+          @if (loginForm.products[$index]().invalid()) {
+            <div class="flex flex-col gap-1 my-2">
+              @for (error of productErrors($index); track error) {
+                <p class="text-error text-sm">{{ error.message }}</p>
+              }
+            </div>
+          }
         </div>
       }
+
       <button type="button" class="btn btn-sm btn-soft" (click)="addRandomProduct()">
         Add Random Product
       </button>
     </div>
+
+    @if (loginForm.products().invalid() && loginForm().touched()) {
+      @for (error of loginForm.products().errors(); track error) {
+        <p class="text-error text-sm">{{ error.message }}</p>
+      }
+    }
   </fieldset>
 
-  <button type="submit" class="btn btn-success mt-4">Submit</button>
+  <label class="label" for="is-public"> Make profile public </label>
+  <input id="is-public" type="checkbox" class="checkbox" [formField]="loginForm.isPublic" />
+
+  @if (!loginForm.publicUrl().hidden()) {
+    <label class="label" for="public-url"> Public URL </label>
+    <input id="public-url" class="input" [formField]="loginForm.publicUrl" />
+  }
+
+  @if (loginForm().dirty()) {
+    <p class="text-yellow-600 text-sm">You have unsaved changes!</p>
+  }
+
+  <div class="flex gap-2">
+    <button
+      type="button"
+      class="btn btn-secondary mt-4"
+      (click)="resetForm()"
+      [disabled]="!loginForm().dirty()"
+    >
+      Reset
+    </button>
+
+    <button type="submit" class="btn btn-success mt-4" [class.btn-disabled]="loginForm().invalid()">
+      Submit
+    </button>
+  </div>
 </form>

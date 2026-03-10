@@ -1,30 +1,17 @@
 import { Component, computed, signal, OnInit } from '@angular/core';
-import { form, FormField } from '@angular/forms/signals';
-
-enum ThemeOptions {
-  Light = 'light',
-  Dark = 'dark',
-  System = 'system',
-}
-
-interface ProductOrder {
-  id: string;
-  name: string;
-  quantity: number;
-}
-
-interface LoginData {
-  email: string;
-  password: string;
-  profile: {
-    firstName: string;
-    lastName: string;
-  };
-  settings: {
-    theme: ThemeOptions;
-  };
-  products: ProductOrder[];
-}
+import {
+  email,
+  form,
+  FormField,
+  hidden,
+  readonly,
+  required,
+  FormRoot,
+  minLength,
+  applyEach,
+  min,
+} from '@angular/forms/signals';
+import { LoginData, ThemeOptions, ProductOrder } from './signal.types';
 
 const FORM_INITIAL_STATE: LoginData = {
   email: '',
@@ -37,19 +24,40 @@ const FORM_INITIAL_STATE: LoginData = {
     theme: ThemeOptions.System,
   },
   products: [],
+  isPublic: false,
+  publicUrl: '',
 };
 
 @Component({
   selector: 'app-form-signal',
-  imports: [FormField],
+  imports: [FormField, FormRoot],
   templateUrl: './signal.html',
-  styleUrl: './signal.css',
 })
 export class Signal implements OnInit {
   loginModel = signal<LoginData>(FORM_INITIAL_STATE);
-  loginForm = form(this.loginModel);
-  passwordLength = computed(() => this.loginForm.password().value().length);
-  themeOptions = Object.values(ThemeOptions);
+  loginForm = form(
+    this.loginModel,
+    (schemaPath) => {
+      required(schemaPath.email, { message: 'Email is required' });
+      email(schemaPath.email, { message: 'Please enter a valid email address' });
+      hidden(schemaPath.publicUrl, ({ valueOf }) => !valueOf(schemaPath.isPublic));
+      readonly(schemaPath.profile.lastName);
+      minLength(schemaPath.products, 1, { message: 'At least one product must be added' });
+      applyEach(schemaPath.products, (productPath) => {
+        required(productPath.id, { message: 'Product ID is required' });
+        required(productPath.name, { message: 'Product name is required' });
+        required(productPath.quantity, { message: 'Product quantity is required' });
+        min(productPath.quantity, 1, { message: 'Quantity must be at least 1' });
+      });
+    },
+    {
+      submission: {
+        action: async () => this.onSubmit(),
+      },
+    },
+  );
+  readonly passwordLength = computed(() => this.loginForm.password().value().length);
+  readonly themeOptions = Object.values(ThemeOptions);
 
   ngOnInit(): void {
     this.loginModel.set({
@@ -63,18 +71,24 @@ export class Signal implements OnInit {
         theme: ThemeOptions.Dark,
       },
       products: [],
+      isPublic: false,
+      publicUrl: '',
     });
   }
 
-  async onSubmit(event: Event) {
-    event.preventDefault();
+  async onSubmit() {
     const formData = this.loginModel();
     console.log('Form submitted with data:', formData);
     this.resetForm();
   }
 
-  private resetForm() {
-    this.loginModel.set(FORM_INITIAL_STATE);
+  resetForm() {
+    this.loginForm().reset(FORM_INITIAL_STATE);
+  }
+
+  productErrors(index: number) {
+    const product = this.loginForm.products[index];
+    return [...product.name().errors(), ...product.quantity().errors()];
   }
 
   addRandomProduct() {
@@ -87,5 +101,7 @@ export class Signal implements OnInit {
       ...model,
       products: [...model.products, newProduct],
     }));
+    // triggering validation for the products field after adding a new product
+    this.loginForm.products().markAsDirty();
   }
 }
