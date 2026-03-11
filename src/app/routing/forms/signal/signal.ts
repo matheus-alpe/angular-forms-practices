@@ -10,8 +10,11 @@ import {
   minLength,
   applyEach,
   min,
+  disabled,
+  debounce,
 } from '@angular/forms/signals';
 import { LoginData, ThemeOptions, ProductOrder } from './signal.types';
+import { FormsModule } from '@angular/forms';
 
 const FORM_INITIAL_STATE: LoginData = {
   email: '',
@@ -30,14 +33,18 @@ const FORM_INITIAL_STATE: LoginData = {
 
 @Component({
   selector: 'app-form-signal',
-  imports: [FormField, FormRoot],
+  imports: [FormField, FormRoot, FormsModule],
   templateUrl: './signal.html',
 })
 export class Signal implements OnInit {
+  isReadonly = signal(false);
+  readonly themeOptions = Object.values(ThemeOptions);
+
   loginModel = signal<LoginData>(FORM_INITIAL_STATE);
   loginForm = form(
     this.loginModel,
     (schemaPath) => {
+      disabled(schemaPath, () => (this.isReadonly() ? 'Form is readonly' : false));
       required(schemaPath.email, { message: 'Email is required' });
       email(schemaPath.email, { message: 'Please enter a valid email address' });
       hidden(schemaPath.publicUrl, ({ valueOf }) => !valueOf(schemaPath.isPublic));
@@ -57,7 +64,15 @@ export class Signal implements OnInit {
     },
   );
   readonly passwordLength = computed(() => this.loginForm.password().value().length);
-  readonly themeOptions = Object.values(ThemeOptions);
+
+  searchModel = signal({
+    query: '',
+  });
+  searchForm = form(this.searchModel, (schemaPath) => {
+    debounce(schemaPath.query, 300);
+    minLength(schemaPath.query, 3, { message: 'Search query must be at least 3 characters long' });
+  });
+  searchFormWithoutDebounce = form(this.searchModel);
 
   ngOnInit(): void {
     this.loginModel.set({

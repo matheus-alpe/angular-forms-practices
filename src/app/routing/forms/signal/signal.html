@@ -1,3 +1,6 @@
+<label for="is-readonly" class="label m-4">Disabled it?</label>
+<input type="checkbox" class="toggle" [(ngModel)]="isReadonly" id="is-readonly" />
+
 <form class="flex flex-col gap-4" [formRoot]="loginForm">
   <fieldset class="fieldset">
     <legend class="fieldset-legend">First Name</legend>
@@ -119,7 +122,12 @@
         </div>
       }
 
-      <button type="button" class="btn btn-sm btn-soft" (click)="addRandomProduct()">
+      <button
+        type="button"
+        class="btn btn-sm btn-soft"
+        (click)="addRandomProduct()"
+        [disabled]="loginForm().disabled()"
+      >
         Add Random Product
       </button>
     </div>
@@ -153,8 +161,40 @@
       Reset
     </button>
 
-    <button type="submit" class="btn btn-success mt-4" [class.btn-disabled]="loginForm().invalid()">
+    <button
+      type="submit"
+      class="btn btn-success mt-4"
+      [class.btn-disabled]="loginForm().invalid()"
+      [disabled]="loginForm().disabled()"
+    >
       Submit
     </button>
   </div>
 </form>
+
+@if (loginForm().disabled()) {
+  @for (reason of loginForm().disabledReasons(); track reason) {
+    <p class="text-yellow-600 text-sm">{{ reason.message }}</p>
+  }
+}
+
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+  <legend class="fieldset-legend">Search Query</legend>
+  <input
+    id="query"
+    type="text"
+    class="input"
+    [placeholder]="`Debounced... Min: ${searchForm.query().minLength?.()}`"
+    [formField]="searchForm.query"
+  />
+
+  <input
+    id="query"
+    type="text"
+    class="input"
+    placeholder="Without debounce..."
+    [formField]="searchFormWithoutDebounce.query"
+  />
+
+  <label for="query" class="label">Search Query: {{ searchModel().query }}</label>
+</fieldset>
