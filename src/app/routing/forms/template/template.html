@@ -1,13 +1,104 @@
-<form>
+<form #templateForm="ngForm" (submit)="onSubmit(templateForm)">
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Template Form</legend>
+    <legend class="fieldset-legend">Template-Driven Form</legend>
 
-    <input
-      id="favorite-color"
-      name="favorite-color"
-      type="text"
-      class="input"
-      [(ngModel)]="favoriteColor"
-    />
+    <fieldset class="fieldset">
+      <label for="name" class="fieldset-label">Name</label>
+      <input
+        id="name"
+        name="name"
+        type="text"
+        class="input"
+        [(ngModel)]="user().name"
+        required
+        #name="ngModel"
+      />
+      @if (submitted() && name.invalid) {
+        <span class="error">Name is required</span>
+      }
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <label for="email" class="fieldset-label">Email</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        class="input"
+        [(ngModel)]="user().email"
+        required
+        email
+        #email="ngModel"
+      />
+      @if (submitted() && email.invalid) {
+        @if (email.errors?.['required']) {
+          <span class="error">Email is required</span>
+        }
+        @if (email.errors?.['email']) {
+          <span class="error">Please enter a valid email</span>
+        }
+      }
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <label for="favorite-color" class="fieldset-label">Favorite Color</label>
+      <input
+        id="favorite-color"
+        name="favoriteColor"
+        type="text"
+        class="input"
+        [(ngModel)]="user().favoriteColor"
+      />
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <label for="country" class="fieldset-label">Country</label>
+      <select
+        id="country"
+        name="country"
+        class="input"
+        [(ngModel)]="user().country"
+        required
+        #country="ngModel"
+      >
+        <option value="" disabled>Select a country</option>
+        @for (c of countries; track c.code) {
+          <option [value]="c.code">{{ c.name }}</option>
+        }
+      </select>
+      @if (submitted() && country.invalid) {
+        <span class="error">Country is required</span>
+      }
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <label for="newsletter" class="fieldset-label">
+        <input id="newsletter" name="newsletter" type="checkbox" [(ngModel)]="user().newsletter" />
+        Subscribe to newsletter
+      </label>
+    </fieldset>
+
+    @if (submitted() && submitMessage()) {
+      <div class="message">{{ submitMessage() }}</div>
+    }
+
+    <div class="card-actions mt-4">
+      <button type="reset" class="btn btn-dash" (click)="reset(templateForm)">Reset</button>
+      <button type="submit" class="btn btn-primary" [disabled]="templateForm.invalid">
+        Submit
+      </button>
+    </div>
   </fieldset>
+
+  <p>Form Values:</p>
+  <pre class="my-4 p-2 bg-base-200 rounded">{{ templateForm.value | json }}</pre>
+
+  <p>Form Errors:</p>
+  <pre class="my-4 p-2 bg-base-200 rounded">{{ templateForm.errors | json }}</pre>
+
+  <p>Form Errors:</p>
+  <pre class="my-4 p-2 bg-base-200 rounded">{{ templateForm.errors | json }}</pre>
+
+  <p>Form Invalid:</p>
+  <pre class="my-4 p-2 bg-base-200 rounded">{{ templateForm.invalid | json }}</pre>
 </form>

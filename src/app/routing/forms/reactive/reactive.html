@@ -1,12 +1,89 @@
-<form>
+<form [formGroup]="profileForm" (submit)="onSubmit()">
   <fieldset class="fieldset">
-    <legend class="fieldset-legend">Favorite Color</legend>
+    <label for="name" class="fieldset-label">Name ({{ name.status }})</label>
     <input
-      id="favorite-color"
-      name="favorite-color"
+      id="name"
       type="text"
       class="input"
-      [formControl]="favoriteColorControl"
+      formControlName="name"
+      [class.input-error]="name.invalid && (name.dirty || name.touched)"
     />
+    @if (name.invalid && (name.dirty || name.touched)) {
+      {{ profileForm.errors | json }}
+      <div class="alert alert-error">
+        @if (name.hasError('required')) {
+          <div>Name is required.</div>
+        }
+        @if (name.hasError('minlength')) {
+          <div>Name must be at least 4 characters long.</div>
+        }
+        @if (name.hasError('forbiddenName')) {
+          <div>Name cannot be Bob.</div>
+        }
+
+        @if (name.hasError('sameName')) {
+          <div>Name and Last Name cannot be the same.</div>
+        }
+      </div>
+    }
   </fieldset>
+
+  <fieldset class="fieldset">
+    <label for="last" class="fieldset-label">Last Name</label>
+    <input id="last" type="text" class="input" formControlName="lastName" />
+    @if (
+      profileForm.invalid &&
+      (profileForm.dirty || profileForm.touched) &&
+      profileForm.hasError('sameName')
+    ) {
+      <div class="alert alert-error">
+        <div>Name and Last Name cannot be the same.</div>
+      </div>
+    }
+  </fieldset>
+
+  <div formArrayName="aliases">
+    @for (alias of aliases.controls; track $index; let i = $index) {
+      <fieldset class="fieldset">
+        <label for="alias-{{ i }}" class="fieldset-label">Alias [{{ i + 1 }}]</label>
+        <input id="alias-{{ i }}" type="text" class="input" [formControlName]="i" />
+      </fieldset>
+    }
+    <button type="button" class="btn btn-neutral btn-xs" (click)="addAlias()">Add Alias</button>
+  </div>
+
+  <div formGroupName="address">
+    <fieldset class="fieldset">
+      <label for="street" class="fieldset-label">Street</label>
+      <input id="street" type="text" class="input" formControlName="street" />
+    </fieldset>
+
+    <fieldset class="fieldset">
+      <label for="city" class="fieldset-label">City</label>
+      <input id="city" type="text" class="input" formControlName="city" />
+    </fieldset>
+  </div>
+
+  <div class="card-actions mt-4">
+    <button type="reset" class="btn btn-dash">Reset</button>
+
+    <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid">Submit</button>
+  </div>
 </form>
+
+<div class="divider"></div>
+
+<div class="join mb-4">
+  <button class="btn btn-info" (click)="patchValue()">Patch Value</button>
+  <button class="btn btn-success" (click)="updateValue()">Update Value</button>
+  <button class="btn btn-secondary" (click)="reset()">Reset</button>
+</div>
+
+<p>Form Value:</p>
+<pre class="my-4 p-2 bg-base-200 rounded">{{ profileForm.value | json }}</pre>
+
+<p>Form Status:</p>
+<pre class="my-4 p-2 bg-base-200 rounded">{{ profileForm.status | json }}</pre>
+
+<p>Form Errors:</p>
+<pre class="my-4 p-2 bg-base-200 rounded">{{ profileForm.errors | json }}</pre>
